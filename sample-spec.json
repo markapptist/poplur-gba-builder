@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "title": "Cinder Isles",
+  "description": "Tame the creatures of a volcanic archipelago.",
+  "rivalName": "Wren", "championName": "Ardo", "partySize": 6,
+  "starters": ["ashpup", "reedling", "flintbug"],
+  "moves": [
+    { "id": "scratch", "displayName": "Scratch", "type": "beast", "power": 40, "accuracy": 100, "effect": "none" },
+    { "id": "ember_spit", "displayName": "Ember Spit", "type": "ember", "power": 60, "accuracy": 90, "effect": "none" },
+    { "id": "tide_slap", "displayName": "Tide Slap", "type": "tide", "power": 55, "accuracy": 95, "effect": "lower_attack" },
+    { "id": "stone_guard", "displayName": "Stone Guard", "type": "stone", "power": 0, "accuracy": 100, "effect": "raise_defense" }
+  ],
+  "creatures": [
+    { "species": "ashpup", "displayName": "Ashpup", "type": "ember", "baseHp": 45, "baseAttack": 50, "baseDefense": 40, "baseSpeed": 60, "moves": ["scratch", "ember_spit"], "rarity": "common", "catchRate": 45, "evolvesInto": "ashhound", "evolveLevel": 16 },
+    { "species": "ashhound", "displayName": "Ashhound", "type": "ember", "baseHp": 70, "baseAttack": 80, "baseDefense": 60, "baseSpeed": 85, "moves": ["ember_spit", "scratch"], "rarity": "rare", "catchRate": 12, "evolvesInto": "", "evolveLevel": 0 },
+    { "species": "reedling", "displayName": "Reedling", "type": "tide", "baseHp": 50, "baseAttack": 45, "baseDefense": 50, "baseSpeed": 45, "moves": ["tide_slap"], "rarity": "common", "catchRate": 50, "evolvesInto": "", "evolveLevel": 0 },
+    { "species": "flintbug", "displayName": "Flintbug", "type": "stone", "baseHp": 40, "baseAttack": 55, "baseDefense": 65, "baseSpeed": 30, "moves": ["scratch", "stone_guard"], "rarity": "common", "catchRate": 55, "evolvesInto": "", "evolveLevel": 0 },
+    { "species": "dune_moth", "displayName": "Dune Moth", "type": "gale", "baseHp": 42, "baseAttack": 48, "baseDefense": 38, "baseSpeed": 70, "moves": ["scratch"], "rarity": "uncommon", "catchRate": 40, "evolvesInto": "", "evolveLevel": 0 },
+    { "species": "cavefish", "displayName": "Cavefish", "type": "tide", "baseHp": 55, "baseAttack": 40, "baseDefense": 55, "baseSpeed": 35, "moves": ["tide_slap"], "rarity": "common", "catchRate": 50, "evolvesInto": "", "evolveLevel": 0 }
+  ],
+  "zones": [
+    { "id": "ember_shore", "displayName": "Ember Shore", "encounters": ["ashpup", "flintbug"], "levelMin": 3, "levelMax": 7 },
+    { "id": "tide_caves", "displayName": "Tide Caves", "encounters": ["cavefish", "reedling", "dune_moth"], "levelMin": 8, "levelMax": 14 }
+  ]
+}
