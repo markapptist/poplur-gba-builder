@@ -9,7 +9,7 @@
  */
 
 import { execFileSync } from "node:child_process";
-import { mkdirSync, readFileSync, writeFileSync, copyFileSync, existsSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, writeFileSync, copyFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 import { generateGameData } from "./codegen.mjs";
@@ -66,9 +66,16 @@ if (spec.version !== EXPECTED_SPEC_VERSION) {
 const work = "/opt/butano/work/rom";
 mkdirSync(join(work, "src"), { recursive: true });
 mkdirSync(join(work, "include"), { recursive: true });
+mkdirSync(join(work, "graphics"), { recursive: true });
 
 for (const f of ["Makefile"]) copyFileSync(join(TEMPLATE, f), join(work, f));
 copyFileSync(join(TEMPLATE, "src", "main.cpp"), join(work, "src", "main.cpp"));
+
+// Sprite art: Butano's asset pipeline turns each .bmp + .json pair into a
+// generated header the engine includes, so these must be in place before make.
+for (const f of readdirSync(join(TEMPLATE, "graphics"))) {
+  copyFileSync(join(TEMPLATE, "graphics", f), join(work, "graphics", f));
+}
 
 const header = generateGameData(spec, TYPE_CHART);
 writeFileSync(join(work, "include", "game_data.h"), header);

@@ -18,7 +18,16 @@
 #include "bn_vector.h"
 #include "bn_bg_palettes.h"
 #include "bn_sprite_ptr.h"
+#include "bn_optional.h"
 #include "bn_sprite_text_generator.h"
+#include "bn_sprite_items_mon_cosmic.h"
+#include "bn_sprite_items_mon_blue_tusk.h"
+#include "bn_sprite_items_mon_leaf_fox.h"
+#include "bn_sprite_items_mon_yellow_fox.h"
+#include "bn_sprite_items_mon_rock_brute.h"
+#include "bn_sprite_items_mon_cloud_ram.h"
+#include "bn_sprite_items_mon_bat.h"
+#include "bn_sprite_items_mon_pink_cat.h"
 #include "common_variable_8x16_sprite_font.h"
 
 #include "game_data.h"
@@ -31,7 +40,33 @@ using poplur::ZONES;
 using poplur::TYPE_EFFECT;
 using poplur::TYPE_NAMES;
 
+/* The text generator makes roughly one sprite per character, so a screen with
+   a heading, three rows and a prompt needs about a hundred. Sizing this at 48
+   overflowed the vector, which trips a Butano assertion and halts the GBA —
+   the console simply stops, which looks exactly like a frozen game. The GBA
+   allows 128 sprites total, so this leaves room for the creatures alongside. */
 constexpr int MAX_TEXT_SPRITES = 64;
+
+/** One drawn creature per element, from Poplur's own sheet. The elements were
+ *  chosen to match what each creature already looks like, so a stone type is
+ *  the rock brute and a gale type is the cloud — the art tells the player the
+ *  matchup before the text does. */
+const bn::sprite_item& creature_art(int type)
+{
+    switch(type)
+    {
+    case 0:  return bn::sprite_items::mon_cosmic;      // ember
+    case 1:  return bn::sprite_items::mon_blue_tusk;   // tide
+    case 2:  return bn::sprite_items::mon_leaf_fox;    // bloom
+    case 3:  return bn::sprite_items::mon_yellow_fox;  // spark
+    case 4:  return bn::sprite_items::mon_rock_brute;  // stone
+    case 5:  return bn::sprite_items::mon_cloud_ram;   // gale
+    case 6:  return bn::sprite_items::mon_bat;         // shade
+    default: return bn::sprite_items::mon_pink_cat;    // beast
+    }
+}
+
+
 constexpr int LINE_HEIGHT = 14;
 constexpr int TOP = -68;
 
@@ -291,6 +326,12 @@ bool battle(Player& player, Mon wild, Screen& screen, bool is_champion)
 {
     int cursor = 0;
 
+    // Held for the whole fight: the two combatants. Re-creating them each
+    // redraw would flicker, so only their frame is refreshed on a change.
+    bn::optional<bn::sprite_ptr> wild_art;
+    bn::optional<bn::sprite_ptr> mine_art;
+    int drawn_wild = -1, drawn_mine = -1;
+
     while(true)
     {
         Mon* mine = player.lead();
@@ -309,6 +350,22 @@ bool battle(Player& player, Mon wild, Screen& screen, bool is_champion)
         if(cursor >= move_count) cursor = 0;
 
         // ---- draw ----
+        // Wild creature upper right, yours lower left — the arrangement every
+        // game of this kind uses, so it reads without being explained.
+        if(drawn_wild != wild.species)
+        {
+            wild_art = creature_art(CREATURES[wild.species].type)
+                .create_sprite(78, -44);
+            drawn_wild = wild.species;
+        }
+        if(drawn_mine != mine->species)
+        {
+            mine_art = creature_art(my_def.type)
+                .create_sprite(78, 26);
+            mine_art->set_horizontal_flip(true);   // facing its opponent
+            drawn_mine = mine->species;
+        }
+
         screen.clear();
         screen.centre(is_champion ? poplur::CHAMPION_NAME : "Wild creature");
         screen.line(mon_line(wild));
@@ -463,6 +520,17 @@ void title_screen(Screen& screen)
 int choose_starter(Screen& screen)
 {
     int cursor = 0;
+
+    // All three on screen at once: the choice is between creatures, and it
+    // should look like one rather than like a list of words.
+    bn::vector<bn::sprite_ptr, 3> art;
+    for(int i = 0; i < 3; ++i)
+    {
+        int species = poplur::STARTERS[i];
+        art.push_back(creature_art(CREATURES[species].type)
+            .create_sprite(-62 + i * 62, 44));
+    }
+
     while(true)
     {
         screen.clear();

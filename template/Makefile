@@ -19,7 +19,7 @@ INCLUDES    :=  include ../../common/include
 DATA        :=
 # common/graphics is not optional: the bundled font header pulls in a sprite
 # item that Butano's asset pipeline generates from this directory.
-GRAPHICS    :=  ../../common/graphics
+GRAPHICS    :=  graphics ../../common/graphics
 AUDIO       :=
 DMGAUDIO    :=
 ROMTITLE    :=  POPLUR GAME
